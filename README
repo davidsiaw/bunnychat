@@ -1,0 +1,11 @@
+BunnyChat
+---------------------------
+This is just a simple chat server that serves the chat interface through http and allows websocket connections to the same port for chatting
+
+Requirements:
+
+nodejs
+npm install express
+npm install socket.io
+
+Only runs on Firefox and Chrome
