@@ -14,8 +14,11 @@
 	
 	if (self)
 	{
+        var url = "" + ipaddress + ":80";
+        console.log('connecting to ' + url );
+
 		webSocket = [[SCSocket alloc]
-			initWithURL:[CPURL URLWithString:@"http://davidsiawpc:8000"]
+			initWithURL:[CPURL URLWithString:url]
 			delegate: self];
 			
 		[webSocket listenForMessage:@"nick" action:@selector(nickResponse:)];

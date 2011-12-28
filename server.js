@@ -3,12 +3,18 @@ var io = require('socket.io');
 
 var app = express.createServer();
 
-var chatserver = io.listen(app);
+
+app.get(/^\/serverinfo.js/, function (req,res) {
+    console.log('requested server information');
+    res.send('var ipaddress = "http://bunnychat.davidsiaw.c9.io";');
+});
 
 app.get(/^\/.*/, function (req,res) {
 	console.log('requested:' + req.url);
 	res.sendfile('html' + req.url);
 });
+
+var chatserver = io.listen(app);
 
 var mainRoomHistory = [];
 var mainUserList = [];
@@ -40,7 +46,7 @@ chatserver.sockets.on('connection', function (socket) {
 		socket.broadcast.emit('join', {nick: socket.nick, room: ''});
 		mainUserList.push(socket.nick);
 		
-		for (itemNumber in mainRoomHistory)
+		for (var itemNumber in mainRoomHistory)
 		{
 			var item = mainRoomHistory[itemNumber];
 			socket.emit('msg', { message: item.msg, nick: item.nick, room: ""});
@@ -52,7 +58,7 @@ chatserver.sockets.on('connection', function (socket) {
 		socket.broadcast.emit('msg', { message: data.message, nick: socket.nick, room: data.roomName});
 		socket.emit('msg', { message: data.message, nick: socket.nick, room: data.roomName});
 		
-		if (data.roomName == "")	// empty is main room
+		if (data.roomName === "")	// empty is main room
 		{
 			mainRoomHistory.push({nick: socket.nick, msg: data.message});
 			if (mainRoomHistory.length > 40)
@@ -84,7 +90,7 @@ chatserver.sockets.on('connection', function (socket) {
 		socket.emit('users', {userArray: mainUserList, room: data.roomName});
 	});
 	
-	socket.on('disconnect', function (data) {
+	socket.on('disconnect', function () {
 		console.log('disconnect ' + socket.nick);
 		socket.broadcast.emit('part', {nick: socket.nick});
 		userToSocket[socket.nick] = undefined;
@@ -92,5 +98,6 @@ chatserver.sockets.on('connection', function (socket) {
 	});
 });
 
-app.listen(8000);
+console.log('server running on port: ' + process.env.PORT);
+app.listen(process.env.PORT);
 
